@@ -91,10 +91,12 @@ class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl> imple
         if (view.glideUrl != null) {
             final String key = view.glideUrl.toString();
             FastImageOkHttpProgressGlideModule.forget(key);
-            List<FastImageViewWithUrl> viewsForKey = VIEWS_FOR_URLS.get(key);
-            if (viewsForKey != null) {
-                viewsForKey.remove(view);
-                if (viewsForKey.size() == 0) VIEWS_FOR_URLS.remove(key);
+            synchronized (VIEWS_FOR_URLS) {
+                List<FastImageViewWithUrl> viewsForKey = VIEWS_FOR_URLS.get(key);
+                if (viewsForKey != null) {
+                    viewsForKey.remove(view);
+                    if (viewsForKey.isEmpty()) VIEWS_FOR_URLS.remove(key);
+                }
             }
         }
 
@@ -114,7 +116,10 @@ class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl> imple
 
     @Override
     public void onProgress(String key, long bytesRead, long expectedLength) {
-        List<FastImageViewWithUrl> viewsForKey = VIEWS_FOR_URLS.get(key);
+        List<FastImageViewWithUrl> viewsForKey;
+        synchronized (VIEWS_FOR_URLS) {
+            viewsForKey = VIEWS_FOR_URLS.get(key);
+        }
         if (viewsForKey != null) {
             for (FastImageViewWithUrl view : viewsForKey) {
                 WritableMap event = new WritableNativeMap();

@@ -114,7 +114,9 @@ class FastImageViewWithUrl extends AppCompatImageView {
             if (viewsForKey != null && !viewsForKey.contains(this)) {
                 viewsForKey.add(this);
             } else if (viewsForKey == null) {
-                List<FastImageViewWithUrl> newViewsForKeys = new ArrayList<>(Collections.singletonList(this));
+                List<FastImageViewWithUrl> newViewsForKeys = Collections.synchronizedList(
+                        new ArrayList<>(Collections.singletonList(this))
+                );
                 viewsForUrlsMap.put(key, newViewsForKeys);
             }
         }
