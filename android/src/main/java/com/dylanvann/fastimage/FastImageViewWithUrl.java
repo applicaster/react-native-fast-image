@@ -56,7 +56,7 @@ class FastImageViewWithUrl extends AppCompatImageView {
     public void onAfterUpdate(
             @Nonnull FastImageViewManager manager,
             @Nullable RequestManager requestManager,
-            @Nonnull Map<String, List<FastImageViewWithUrl>> viewsForUrlsMap) {
+            @Nonnull final Map<String, List<FastImageViewWithUrl>> viewsForUrlsMap) {
         if (!mNeedsReload)
             return;
 
@@ -110,12 +110,16 @@ class FastImageViewWithUrl extends AppCompatImageView {
 
         if (glideUrl != null) {
             FastImageOkHttpProgressGlideModule.expect(key, manager);
-            List<FastImageViewWithUrl> viewsForKey = viewsForUrlsMap.get(key);
-            if (viewsForKey != null && !viewsForKey.contains(this)) {
-                viewsForKey.add(this);
-            } else if (viewsForKey == null) {
-                List<FastImageViewWithUrl> newViewsForKeys = new ArrayList<>(Collections.singletonList(this));
-                viewsForUrlsMap.put(key, newViewsForKeys);
+            synchronized (viewsForUrlsMap) {
+                List<FastImageViewWithUrl> viewsForKey = viewsForUrlsMap.get(key);
+                if (viewsForKey != null && !viewsForKey.contains(this)) {
+                    viewsForKey.add(this);
+                } else if (viewsForKey == null) {
+                    List<FastImageViewWithUrl> newViewsForKeys = Collections.synchronizedList(
+                            new ArrayList<>(Collections.singletonList(this))
+                    );
+                    viewsForUrlsMap.put(key, newViewsForKeys);
+                }
             }
         }
 
