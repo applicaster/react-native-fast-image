@@ -30,6 +30,12 @@
     }
 }
 
+- (void) setUseLastImageAsDefaultSource: (BOOL*)useLastImageAsDefaultSource {
+    if (useLastImageAsDefaultSource != _useLastImageAsDefaultSource) {
+        _useLastImageAsDefaultSource = useLastImageAsDefaultSource;
+    }
+}
+
 - (void) setOnFastImageLoadEnd: (RCTDirectEventBlock)onFastImageLoadEnd {
     _onFastImageLoadEnd = onFastImageLoadEnd;
     if (self.hasCompleted) {
@@ -205,7 +211,7 @@
 - (void) downloadImage: (FFFastImageSource*)source options: (SDWebImageOptions)options context: (SDWebImageContext*)context {
     __weak typeof(self) weakSelf = self; // Always use a weak reference to self in blocks
     [self sd_setImageWithURL: _source.url
-            placeholderImage: _defaultSource
+            placeholderImage: _useLastImageAsDefaultSource == YES ? [super image] : _defaultSource
                      options: options
                      context: context
                     progress: ^(NSInteger receivedSize, NSInteger expectedSize, NSURL* _Nullable targetURL) {
