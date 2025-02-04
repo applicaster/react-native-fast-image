@@ -1,4 +1,6 @@
 package com.dylanvann.fastimage;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 
 import static com.dylanvann.fastimage.FastImageRequestListener.REACT_ON_ERROR_EVENT;
 
@@ -28,6 +30,8 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 
 class FastImageViewWithUrl extends AppCompatImageView {
+    private Boolean mUseLastImageAsDefaultSource = false;
+
     private boolean mNeedsReload = false;
     private ReadableMap mSource = null;
     private Drawable mDefaultSource = null;
@@ -41,11 +45,23 @@ class FastImageViewWithUrl extends AppCompatImageView {
     public void setSource(@Nullable ReadableMap source) {
         mNeedsReload = true;
         mSource = source;
+
+        if (mUseLastImageAsDefaultSource) {
+            BitmapDrawable currentDrawable = (BitmapDrawable) this.getDrawable();
+            Bitmap toBmp = currentDrawable == null ? null : currentDrawable .getBitmap();
+            if (toBmp != null && !toBmp.isRecycled()) {
+                this.setDefaultSource(new BitmapDrawable(getResources(), toBmp.copy(toBmp.getConfig(), false)));
+            }
+        }
     }
 
     public void setDefaultSource(@Nullable Drawable source) {
         mNeedsReload = true;
         mDefaultSource = source;
+    }
+
+    public void useLastImageAsDefaultSource(@Nullable Boolean isActivated) {
+        mUseLastImageAsDefaultSource = isActivated;
     }
 
     private boolean isNullOrEmpty(final String url) {
