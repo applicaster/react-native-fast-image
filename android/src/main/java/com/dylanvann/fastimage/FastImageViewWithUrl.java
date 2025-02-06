@@ -42,20 +42,21 @@ class FastImageViewWithUrl extends AppCompatImageView {
         super(context);
     }
 
-    public void setSource(@Nullable ReadableMap source) {
-        mNeedsReload = true;
-        mSource = source;
+public void setSource(@Nullable ReadableMap source) {
+    mNeedsReload = true;
+    mSource = source;
 
-        if (mUseLastImageAsDefaultSource) {
-            BitmapDrawable currentDrawable = (BitmapDrawable) this.getDrawable();
-            if(currentDrawable != null) {
-                Bitmap toBmp = currentDrawable == null ? null : currentDrawable.getBitmap();
-                if (toBmp != null && !toBmp.isRecycled()) {
-                    this.setDefaultSource(new BitmapDrawable(getResources(), toBmp.copy(toBmp.getConfig(), false)));
-                }
+    if (mUseLastImageAsDefaultSource) {
+        Drawable currentDrawable = this.getDrawable();
+        if (currentDrawable instanceof BitmapDrawable) {
+            Bitmap bitmap = ((BitmapDrawable) currentDrawable).getBitmap();
+            if (bitmap != null && !bitmap.isRecycled()) {
+                Bitmap defaultBitmap = bitmap.copy(bitmap.getConfig(), false);
+                setDefaultSource(new BitmapDrawable(getResources(), defaultBitmap));
             }
         }
     }
+}
 
     public void setDefaultSource(@Nullable Drawable source) {
         mNeedsReload = true;
