@@ -84,6 +84,12 @@ class FastImageViewManager extends SimpleViewManager<FastImageViewWithUrl> imple
         view.setScaleType(scaleType);
     }
 
+
+    @ReactProp(name = "useLastImageAsDefaultSource")
+    public void useLastImageAsDefaultSource(FastImageViewWithUrl view, @Nullable Boolean isActivated) {
+        view.useLastImageAsDefaultSource(isActivated);
+    }
+
     @Override
     public void onDropViewInstance(@NonNull FastImageViewWithUrl view) {
         // This will cancel existing requests.
